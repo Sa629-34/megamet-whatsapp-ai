@@ -39,43 +39,78 @@ VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "megamet_verify_123")  # Meta dash
 
 GREETING_KEYWORDS = [
     "thank", "thanks", "thankyou", "dhanyavaad", "dhanyawad",
-    "same to you", "happy anant", "happy chaturdashi", "shubhkamna",
-    "welcome", "🙏", "👍", "❤️", "nice", "good",
+    "same to you", "happy anant", "happy chaturdashi", "happy ganesh",
+    "ganpati", "shubhkamna", "welcome", "🙏", "👍", "❤️", "nice", "good",
 ]
 
 PRICE_KEYWORDS = [
-    "price", "rate", "cost", "quote", "kitna", "kimat", "keemat",
-    "negotiat", "discount",
+    "price", "rate", "cost", "quote", "quotation", "kitna", "kimat",
+    "keemat", "negotiat", "discount", "budget",
+]
+
+DELIVERY_KEYWORDS = [
+    "deliver", "delivery", "location", "city", "state", "where",
+    "shipping", "transport", "reach", "area", "pincode",
+]
+
+SAMPLE_MOQ_KEYWORDS = [
+    "sample", "moq", "minimum order", "minimum quantity", "trial",
+]
+
+ABOUT_KEYWORDS = [
+    "who are you", "what is this", "about", "company", "kya hai",
+    "kaun ho", "what do you do", "megamet",
 ]
 
 BUSINESS_KEYWORDS = [
     "wood", "timber", "lakdi", "pine", "kd wood", "kiln", "supply",
-    "furniture", "packaging", "construction", "import", "delivery",
-    "quantity", "order", "product", "sample", "moq",
+    "furniture", "packaging", "construction", "import", "quantity",
+    "order", "product", "requirement", "need",
 ]
 
 GREETING_REPLY = (
-    "Dhanyavaad! Aapko bhi Anant Chaturdashi ki shubhkamnayein 🙏 "
-    "- Megamet India"
+    "Thank you! Wishing you a very Happy Ganesh Chaturthi / Anant "
+    "Chaturdashi too 🙏 - Team Megamet India"
 )
 
 PRICE_REPLY = (
-    "Dhanyavaad interest ke liye! Pricing/quote ki exact detail hamari "
-    "sales team aapko confirm karke degi. Kripya apna naam, requirement "
-    "(quantity/product) aur city share karein, hum jald contact karenge."
+    "Thanks for your interest! Exact pricing/quotes are shared by our "
+    "sales team based on your requirement. Please share your name, "
+    "product & quantity needed, and your city - our team will contact "
+    "you shortly."
+)
+
+DELIVERY_REPLY = (
+    "We deliver our timber (KD pine wood) to various locations across "
+    "India. Please share your city/state and requirement - our sales "
+    "team will confirm delivery details and timelines."
+)
+
+SAMPLE_MOQ_REPLY = (
+    "Thanks for asking! Sample availability and minimum order quantity "
+    "details are confirmed by our sales team based on the product. "
+    "Please share your requirement and city, and our team will get back "
+    "to you."
+)
+
+ABOUT_REPLY = (
+    "Megamet India Pvt Ltd is an importer and distributor of KD "
+    "(kiln-dried) pine wood from Europe and the Baltic countries, "
+    "supplying across India for sustainable timber, packaging, "
+    "furniture manufacturing and construction needs."
 )
 
 BUSINESS_REPLY = (
-    "Namaste! Megamet India Pvt Ltd - hum Europe aur Baltic countries se "
-    "KD (kiln-dried) pine wood import karke India mein deliver karte hain. "
-    "Aapko kya requirement hai (product/quantity/location)? Hamari sales "
-    "team aapse jald contact karke detail share karegi."
+    "Hello! Megamet India Pvt Ltd imports KD (kiln-dried) pine wood from "
+    "Europe and the Baltic countries and delivers it across India. "
+    "Could you share your requirement (product/quantity/location)? Our "
+    "sales team will reach out to you shortly with details."
 )
 
 DEFAULT_REPLY = (
-    "Namaste! Ye Megamet India ka WhatsApp hai - hum timber (pine wood) "
-    "import aur supply karte hain. Aap apna requirement ya sawal bata "
-    "sakte hain, hamari team jald reply karegi."
+    "Hello! This is Megamet India's WhatsApp - we import and supply "
+    "timber (pine wood) across India. Please share your requirement or "
+    "question, and our team will get back to you shortly."
 )
 
 
@@ -85,6 +120,12 @@ def get_faq_reply(user_message: str) -> str:
 
     if any(word in text for word in PRICE_KEYWORDS):
         return PRICE_REPLY
+    if any(word in text for word in SAMPLE_MOQ_KEYWORDS):
+        return SAMPLE_MOQ_REPLY
+    if any(word in text for word in DELIVERY_KEYWORDS):
+        return DELIVERY_REPLY
+    if any(word in text for word in ABOUT_KEYWORDS):
+        return ABOUT_REPLY
     if any(word in text for word in BUSINESS_KEYWORDS):
         return BUSINESS_REPLY
     if any(word in text for word in GREETING_KEYWORDS):
