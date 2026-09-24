@@ -1,9 +1,10 @@
 """
-Megamet India - WhatsApp AI Agent
+Megamet India - WhatsApp FAQ Bot (Marketing)
 -----------------------------------
 Yeh app WhatsApp Business number pe aane wale customer messages ko
-automatically padhta hai, Claude AI se jawab generate karwata hai
-(company ki jaankari ke hisaab se), aur customer ko wapas reply bhejta hai.
+automatically padhta hai, aur FIXED (keyword-based) rules ke hisaab se
+jawab bhejta hai. Ye "real AI" (paid) nahi hai - ye free hai, kisi
+Anthropic/OpenAI API ki zaroorat nahi.
 
 Yeh app hamesha (24/7) chalna chahiye, isliye ise Render.com (ya kisi bhi
 cloud hosting) pe deploy karna hai - apne computer pe nahi.
@@ -30,79 +31,67 @@ app = Flask(__name__)
 WHATSAPP_ACCESS_TOKEN = os.environ.get("WHATSAPP_ACCESS_TOKEN", "")
 PHONE_NUMBER_ID = os.environ.get("PHONE_NUMBER_ID", "1427617750424162")
 VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "megamet_verify_123")  # Meta dashboard mein yehi daalna hoga
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 # =========================================================
-# MARKETING AI - scope: sirf poster/campaign ke baad aane wale
-# customer replies ko engage karna. Sales negotiation, price
-# finalize karna iska kaam NAHI hai - wo "Sales Team AI" (alag se
-# banega) karega. Marketing AI sirf interest capture aur
-# warm-up karta hai, phir sales ko handover ka sanket deta hai.
+# FAQ REPLIES - fixed, hardcoded jawab. Koi AI/paid API nahi lagta.
+# Naya sawal/keyword add karna ho toh RULES list mein neeche add karo.
 # =========================================================
 
-BUSINESS_CONTEXT = """
-Tum Megamet India ke WhatsApp MARKETING assistant ho - tumhara kaam
-sirf naye leads ko engage karna hai, sales close karna nahi.
+GREETING_KEYWORDS = [
+    "thank", "thanks", "thankyou", "dhanyavaad", "dhanyawad",
+    "same to you", "happy anant", "happy chaturdashi", "shubhkamna",
+    "welcome", "🙏", "👍", "❤️", "nice", "good",
+]
 
-ABHI KA CAMPAIGN: Aaj/kal customer list ko ek "Happy Anant Chaturdashi"
-greeting poster bheja gaya hai (Megamet ke branding ke saath, jisme
-neeche likha hai: Sustainable Timber | Packaging | Furniture
-Manufacturing | Construction | Stronger Communities, tagline "Timber
-for a Better Tomorrow"). Zyada tar replies isi poster ke response mein
-aayenge.
+PRICE_KEYWORDS = [
+    "price", "rate", "cost", "quote", "kitna", "kimat", "keemat",
+    "negotiat", "discount",
+]
 
-Company (yehi confirmed facts hain, isse zyada kuch mat maano ya invent mat karo):
-- Megamet India Pvt Ltd - Europe aur Baltic countries se KD (kiln-dried)
-  pine wood import karke India ke alag-alag locations mein deliver/distribute
-  karti hai.
-- Business: timber/lakdi import aur distribution. Timber ka use in
-  sustainable/packaging/furniture-manufacturing/construction jaise
-  industries mein hota hai (jaisa poster mein likha hai) - lekin hum
-  khud sirf timber import aur supply karte hain, furniture ya
-  packaging khud MAT banate/bechte, jab tak confirm na ho.
-- Transporter, logistics, truck booking, ya kisi aur unrelated service
-  ka koi zikr MAT karo - yeh sirf timber ka business hai.
+BUSINESS_KEYWORDS = [
+    "wood", "timber", "lakdi", "pine", "kd wood", "kiln", "supply",
+    "furniture", "packaging", "construction", "import", "delivery",
+    "quantity", "order", "product", "sample", "moq",
+]
 
-CAMPAIGN REPLY HANDLING (poster ke response ke liye):
-- Agar customer sirf greeting wapas kare ("Thank you", "Same to you",
-  "Happy Anant Chaturdashi", emoji, etc.) - warmly short thanks reply
-  do, business pitch mat thoko. Jaise: "Dhanyavaad! Aapko bhi Anant
-  Chaturdashi ki shubhkamnayein 🙏"
-- Agar customer poster dekh ke business-related sawal kare (timber,
-  pine wood, packaging/furniture/construction ke liye lakdi chahiye,
-  supply, quality, etc.) - upar diye confirmed facts ke hisaab se
-  reply karo aur unka interest/requirement pucho.
-- Agar customer kuch unrelated/random likhe jiska poster ya company se
-  koi lena dena nahi - politely bolo ki ye Megamet India ka WhatsApp
-  hai, timber import/supply ke baare mein madad kar sakte hain.
+GREETING_REPLY = (
+    "Dhanyavaad! Aapko bhi Anant Chaturdashi ki shubhkamnayein 🙏 "
+    "- Megamet India"
+)
 
-BAHUT ZAROORI RULE - Hallucination allowed NAHI hai:
-- Specific details jo tumhe upar nahi di gayi hain (jaise exact species/grades,
-  exact despatch city, MOQ, pricing, delivery timeline) - ye KABHI mat
-  invent/guess karo. Agar customer ye pooche, seedha bolo: "Ye detail
-  hamari sales team aapko confirm karke degi" - aur unka contact lene ki
-  koshish karo (naam, phone number, requirement).
-- Sirf wahi facts bolo jo upar diye gaye hain. Kuch bhi extra mat bolo
-  jo diya nahi gaya.
+PRICE_REPLY = (
+    "Dhanyavaad interest ke liye! Pricing/quote ki exact detail hamari "
+    "sales team aapko confirm karke degi. Kripya apna naam, requirement "
+    "(quantity/product) aur city share karein, hum jald contact karenge."
+)
 
-Tumhara scope (Marketing AI):
-- Customer ne poster/ad dekh ke reply kiya hai - use warmly welcome karo,
-  sirf upar diye confirmed facts ke hisaab se basic jaankari do.
-- Uska interest samjho: konsa product chahiye, kitni quantity, kaha deliver
-  karwana hai - ye basic details friendly tarike se pucho.
-- KABHI bhi exact price quote MAT karo, negotiation mat karo.
-- Jab lead "warm" lage (genuinely interested, details de raha ho), toh
-  bolo: "Hamari sales team aapse jald contact karegi detailed quote ke
-  saath" - aur baat ko wahi close karo.
-- Agar customer directly price/negotiation pe chala jaye, politely bolo
-  ki sales team exact pricing discuss karegi.
+BUSINESS_REPLY = (
+    "Namaste! Megamet India Pvt Ltd - hum Europe aur Baltic countries se "
+    "KD (kiln-dried) pine wood import karke India mein deliver karte hain. "
+    "Aapko kya requirement hai (product/quantity/location)? Hamari sales "
+    "team aapse jald contact karke detail share karegi."
+)
 
-Rules:
-- Hamesha polite, friendly tone (Hindi/English mix, jaisa customer likhe).
-- Chhote, clear jawab do - WhatsApp message jaisa, lamba essay nahi.
-- Kabhi galat/banayi hui information mat do - pata na ho toh saaf bolo
-  team confirm karke batayegi.
-"""
+DEFAULT_REPLY = (
+    "Namaste! Ye Megamet India ka WhatsApp hai - hum timber (pine wood) "
+    "import aur supply karte hain. Aap apna requirement ya sawal bata "
+    "sakte hain, hamari team jald reply karegi."
+)
+
+
+def get_faq_reply(user_message: str) -> str:
+    """Simple keyword-matching FAQ bot - no paid AI, free to run."""
+    text = user_message.lower()
+
+    if any(word in text for word in PRICE_KEYWORDS):
+        return PRICE_REPLY
+    if any(word in text for word in BUSINESS_KEYWORDS):
+        return BUSINESS_REPLY
+    if any(word in text for word in GREETING_KEYWORDS):
+        return GREETING_REPLY
+
+    return DEFAULT_REPLY
+
 
 # =========================================================
 # WEBHOOK VERIFICATION (Meta ek baar GET request bhejta hai setup ke time)
@@ -145,7 +134,7 @@ def receive_message():
             reply_text = "Abhi hum sirf text messages samajh paate hain. Kripya apna sawal likh kar bhejein."
         else:
             user_text = message["text"]["body"]
-            reply_text = get_ai_reply(user_text)
+            reply_text = get_faq_reply(user_text)
 
         send_whatsapp_message(from_number, reply_text)
 
@@ -153,29 +142,6 @@ def receive_message():
         print("Parse error (probably a status update, ignoring):", e)
 
     return "OK", 200
-
-
-# =========================================================
-# AI REPLY - Claude API se jawab generate karwana
-# =========================================================
-
-def get_ai_reply(user_message: str) -> str:
-    url = "https://api.anthropic.com/v1/messages"
-    headers = {
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-    }
-    payload = {
-        "model": "claude-sonnet-4-5",
-        "max_tokens": 300,
-        "system": BUSINESS_CONTEXT,
-        "messages": [{"role": "user", "content": user_message}],
-    }
-    response = requests.post(url, headers=headers, json=payload, timeout=30)
-    response.raise_for_status()
-    result = response.json()
-    return result["content"][0]["text"]
 
 
 # =========================================================
@@ -200,7 +166,7 @@ def send_whatsapp_message(to_number: str, text: str):
 
 @app.route("/", methods=["GET"])
 def health_check():
-    return "Megamet WhatsApp AI agent is running.", 200
+    return "Megamet WhatsApp FAQ bot is running.", 200
 
 
 if __name__ == "__main__":
