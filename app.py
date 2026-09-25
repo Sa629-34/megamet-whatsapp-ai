@@ -1,20 +1,21 @@
 """
 Megamet India - WhatsApp FAQ Bot (Marketing)
 -----------------------------------
-Yeh app WhatsApp Business number pe aane wale customer messages ko
-automatically padhta hai, aur FIXED (keyword-based) rules ke hisaab se
-jawab bhejta hai. Ye "real AI" (paid) nahi hai - ye free hai, kisi
-Anthropic/OpenAI API ki zaroorat nahi.
+This app automatically reads incoming customer messages on the WhatsApp
+Business number, and replies using FIXED (keyword-based) rules. This is
+NOT "real AI" (paid) - it is free, no Anthropic/OpenAI API needed.
 
-Yeh app hamesha (24/7) chalna chahiye, isliye ise Render.com (ya kisi bhi
-cloud hosting) pe deploy karna hai - apne computer pe nahi.
+This app should run 24/7, so it needs to be deployed on Render.com (or
+any cloud hosting) - not on your own computer.
 
 SETUP:
-1. Neeche "CONFIG" section mein apni values daalo (ya better, environment
-   variables se set karo - Render pe "Environment" tab mein).
-2. requirements.txt mein diye packages install honge automatically Render pe.
-3. Deploy hone ke baad jo URL milega (jaise https://megamet-ai.onrender.com),
-   uske aage "/webhook" laga ke Meta App Dashboard mein Callback URL mein daal do.
+1. Set your values in the "CONFIG" section below (or better, set them as
+   environment variables in Render's "Environment" tab).
+2. Packages listed in requirements.txt will be installed automatically
+   on Render.
+3. Once deployed, take the URL you get (e.g. https://megamet-ai.onrender.com),
+   add "/webhook" at the end, and put it as the Callback URL in the Meta
+   App Dashboard.
 """
 
 import os
@@ -25,16 +26,16 @@ from flask import Flask, request
 app = Flask(__name__)
 
 # =========================================================
-# CONFIG - yeh values Render ke "Environment Variables" mein set karo
+# CONFIG - set these values in Render's "Environment Variables"
 # =========================================================
 
 WHATSAPP_ACCESS_TOKEN = os.environ.get("WHATSAPP_ACCESS_TOKEN", "")
 PHONE_NUMBER_ID = os.environ.get("PHONE_NUMBER_ID", "1427617750424162")
-VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "megamet_verify_123")  # Meta dashboard mein yehi daalna hoga
+VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "megamet_verify_123")  # this must match the Meta dashboard
 
 # =========================================================
-# FAQ REPLIES - fixed, hardcoded jawab. Koi AI/paid API nahi lagta.
-# Naya sawal/keyword add karna ho toh RULES list mein neeche add karo.
+# FAQ REPLIES - fixed, hardcoded answers. No AI/paid API used.
+# To add a new question/keyword, add it to the lists below.
 # =========================================================
 
 GREETING_KEYWORDS = [
@@ -68,6 +69,12 @@ BUSINESS_KEYWORDS = [
     "order", "product", "requirement", "need",
 ]
 
+CONTACT_INFO = (
+    "\n\nSales Contact: Chintan Vora - +91 98708 63388\n"
+    "Email: mail@megamet.in\n"
+    "Website: www.megamet.in"
+)
+
 GREETING_REPLY = (
     "Thank you! Wishing you a very Happy Ganesh Chaturthi / Anant "
     "Chaturdashi too 🙏 - Team Megamet India"
@@ -77,40 +84,40 @@ PRICE_REPLY = (
     "Thanks for your interest! Exact pricing/quotes are shared by our "
     "sales team based on your requirement. Please share your name, "
     "product & quantity needed, and your city - our team will contact "
-    "you shortly."
+    "you shortly." + CONTACT_INFO
 )
 
 DELIVERY_REPLY = (
     "We deliver our timber (KD pine wood) to various locations across "
     "India. Please share your city/state and requirement - our sales "
-    "team will confirm delivery details and timelines."
+    "team will confirm delivery details and timelines." + CONTACT_INFO
 )
 
 SAMPLE_MOQ_REPLY = (
     "Thanks for asking! Sample availability and minimum order quantity "
     "details are confirmed by our sales team based on the product. "
     "Please share your requirement and city, and our team will get back "
-    "to you."
+    "to you." + CONTACT_INFO
 )
 
 ABOUT_REPLY = (
-    "Megamet India Pvt Ltd is an importer and distributor of KD "
-    "(kiln-dried) pine wood from Europe and the Baltic countries, "
+    "Megamet India Pvt Ltd is the largest importer and distributor of KD "
+    "(kiln-dried) pine wood from Europe, Russia and the Baltic countries, "
     "supplying across India for sustainable timber, packaging, "
-    "furniture manufacturing and construction needs."
+    "furniture manufacturing and construction needs." + CONTACT_INFO
 )
 
 BUSINESS_REPLY = (
     "Hello! Megamet India Pvt Ltd imports KD (kiln-dried) pine wood from "
     "Europe and the Baltic countries and delivers it across India. "
     "Could you share your requirement (product/quantity/location)? Our "
-    "sales team will reach out to you shortly with details."
+    "sales team will reach out to you shortly with details." + CONTACT_INFO
 )
 
 DEFAULT_REPLY = (
     "Hello! This is Megamet India's WhatsApp - we import and supply "
     "timber (pine wood) across India. Please share your requirement or "
-    "question, and our team will get back to you shortly."
+    "question, and our team will get back to you shortly." + CONTACT_INFO
 )
 
 
@@ -135,7 +142,7 @@ def get_faq_reply(user_message: str) -> str:
 
 
 # =========================================================
-# WEBHOOK VERIFICATION (Meta ek baar GET request bhejta hai setup ke time)
+# WEBHOOK VERIFICATION (Meta sends a one-time GET request during setup)
 # =========================================================
 
 @app.route("/webhook", methods=["GET"])
@@ -150,7 +157,7 @@ def verify_webhook():
 
 
 # =========================================================
-# INCOMING MESSAGES (Meta yahan customer ka message POST karta hai)
+# INCOMING MESSAGES (Meta POSTs the customer's message here)
 # =========================================================
 
 @app.route("/webhook", methods=["POST"])
@@ -164,7 +171,7 @@ def receive_message():
         value = changes["value"]
 
         if "messages" not in value:
-            # Ye status update hai (delivered/read), message nahi - ignore karo
+            # This is a status update (delivered/read), not a message - ignore it
             return "OK", 200
 
         message = value["messages"][0]
@@ -172,7 +179,7 @@ def receive_message():
         msg_type = message.get("type")
 
         if msg_type != "text":
-            reply_text = "Abhi hum sirf text messages samajh paate hain. Kripya apna sawal likh kar bhejein."
+            reply_text = "We currently only support text messages. Please type your question and send it."
         else:
             user_text = message["text"]["body"]
             reply_text = get_faq_reply(user_text)
@@ -186,7 +193,7 @@ def receive_message():
 
 
 # =========================================================
-# WHATSAPP KO REPLY BHEJNA
+# SENDING THE REPLY BACK ON WHATSAPP
 # =========================================================
 
 def send_whatsapp_message(to_number: str, text: str):
