@@ -46,21 +46,23 @@ GREETING_KEYWORDS = [
 
 PRICE_KEYWORDS = [
     "price", "rate", "cost", "quote", "quotation", "kitna", "kimat",
-    "keemat", "negotiat", "discount", "budget",
+    "keemat", "negotiat", "discount", "budget", "what is the price",
 ]
 
 DELIVERY_KEYWORDS = [
     "deliver", "delivery", "location", "city", "state", "where",
     "shipping", "transport", "reach", "area", "pincode",
+    "where do you deliver",
 ]
 
 SAMPLE_MOQ_KEYWORDS = [
     "sample", "moq", "minimum order", "minimum quantity", "trial",
+    "sample chahiye",
 ]
 
 ABOUT_KEYWORDS = [
     "who are you", "what is this", "about", "company", "kya hai",
-    "kaun ho", "what do you do", "megamet",
+    "kaun ho", "what do you do", "megamet", "about your company",
 ]
 
 BUSINESS_KEYWORDS = [
