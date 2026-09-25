@@ -71,10 +71,20 @@ BUSINESS_KEYWORDS = [
     "order", "product", "requirement", "need",
 ]
 
+CONTACT_KEYWORDS = [
+    "contact number", "sales contact", "mail id", "email id", "your email",
+    "your number", "phone number", "mobile number", "contact details",
+    "sales number", "whatsapp number", "call number", "mail sales contact",
+]
+
 CONTACT_INFO = (
     "\n\nSales Contact: Chintan Vora - +91 98708 63388\n"
     "Email: mail@megamet.in\n"
     "Website: www.megamet.in"
+)
+
+CONTACT_REPLY = (
+    "Sure! Here are our contact details:" + CONTACT_INFO
 )
 
 GREETING_REPLY = (
@@ -127,6 +137,8 @@ def get_faq_reply(user_message: str) -> str:
     """Simple keyword-matching FAQ bot - no paid AI, free to run."""
     text = user_message.lower()
 
+    if any(word in text for word in CONTACT_KEYWORDS):
+        return CONTACT_REPLY
     if any(word in text for word in PRICE_KEYWORDS):
         return PRICE_REPLY
     if any(word in text for word in SAMPLE_MOQ_KEYWORDS):
