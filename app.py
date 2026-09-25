@@ -79,47 +79,47 @@ CONTACT_INFO = (
 
 GREETING_REPLY = (
     "Thank you! Wishing you a very Happy Ganesh Chaturthi / Anant "
-    "Chaturdashi too 🙏 - Team Megamet India"
+    "Chaturdashi too 🙏 - Team Megamet India" + CONTACT_INFO
 )
 
 PRICE_REPLY = (
     "Thanks for your interest! Exact pricing/quotes are shared by our "
     "sales team based on your requirement. Please share your name, "
     "product & quantity needed, and your city - our team will contact "
-    "you shortly." + CONTACT_INFO
+    "you shortly."
 )
 
 DELIVERY_REPLY = (
     "We deliver our timber (KD pine wood) to various locations across "
     "India. Please share your city/state and requirement - our sales "
-    "team will confirm delivery details and timelines." + CONTACT_INFO
+    "team will confirm delivery details and timelines."
 )
 
 SAMPLE_MOQ_REPLY = (
     "Thanks for asking! Sample availability and minimum order quantity "
     "details are confirmed by our sales team based on the product. "
     "Please share your requirement and city, and our team will get back "
-    "to you." + CONTACT_INFO
+    "to you."
 )
 
 ABOUT_REPLY = (
     "Megamet India Pvt Ltd is the largest importer and distributor of KD "
     "(kiln-dried) pine wood from Europe, Russia and the Baltic countries, "
     "supplying across India for sustainable timber, packaging, "
-    "furniture manufacturing and construction needs." + CONTACT_INFO
+    "furniture manufacturing and construction needs."
 )
 
 BUSINESS_REPLY = (
     "Hello! Megamet India Pvt Ltd imports KD (kiln-dried) pine wood from "
     "Europe and the Baltic countries and delivers it across India. "
     "Could you share your requirement (product/quantity/location)? Our "
-    "sales team will reach out to you shortly with details." + CONTACT_INFO
+    "sales team will reach out to you shortly with details."
 )
 
 DEFAULT_REPLY = (
     "Hello! This is Megamet India's WhatsApp - we import and supply "
     "timber (pine wood) across India. Please share your requirement or "
-    "question, and our team will get back to you shortly." + CONTACT_INFO
+    "question, and our team will get back to you shortly."
 )
 
 
