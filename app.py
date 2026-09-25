@@ -79,6 +79,7 @@ CONTACT_KEYWORDS = [
 
 CONTACT_INFO = (
     "\n\nSales Contact: Chintan Vora - +91 98708 63388\n"
+    "Sales Contact: Bhaskar Mehta - +91 89766 08029\n"
     "Email: mail@megamet.in\n"
     "Website: www.megamet.in"
 )
