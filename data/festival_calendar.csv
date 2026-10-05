@@ -1,0 +1,5 @@
+date,festival,template_name,poster_file,exclude_religions,notes
+2026-10-11,Navratri Begins,navratri_greeting,posters/navratri.jpg,Muslim|Christian,
+2026-10-20,Dussehra (Vijayadashami),dussehra_greeting,posters/dussehra.jpg,Muslim|Christian,
+2026-11-06,Dhanteras,dhanteras_greeting,posters/dhanteras.jpg,Muslim|Christian,
+2026-11-08,Diwali (Lakshmi Puja),diwali_greeting,posters/diwali.jpg,Muslim|Christian,Biggest send of the year
